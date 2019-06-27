@@ -1,4 +1,4 @@
-map <- function(k, n, a=0.05, b=1) {
+bayesprev_map <- function(k, n, a=0.05, b=1) {
 	# Bayesian maximum a posteriori estimate of population prevalence gamma
 	# under a uniform prior
 	# 
@@ -14,7 +14,7 @@ map <- function(k, n, a=0.05, b=1) {
 	return(gm)
 } 
 
-posterior <- function(x, k, n, a=0.05, b=1) {
+bayesprev_posterior <- function(x, k, n, a=0.05, b=1) {
 	# Bayesian posterior of population prevalence gamma under a uniform prior
 	#
     # Args:
@@ -33,7 +33,7 @@ posterior <- function(x, k, n, a=0.05, b=1) {
 }
 
 
-bound <- function(p, k, n, a=0.05, b=1) {
+bayesprev_bound <- function(p, k, n, a=0.05, b=1) {
 	# Bayesian lower bound of population prevalence gamma under a uniform prior
 	#
     # Args:
@@ -51,7 +51,7 @@ bound <- function(p, k, n, a=0.05, b=1) {
 }
 
 
-hdpi <- function(p, k, n, a=0.05, b=1) {
+bayesprev_hdpi <- function(p, k, n, a=0.05, b=1) {
 	# Bayesian highest posterior density interval of population prevalence gamma
     # under a uniform prior
 	#
