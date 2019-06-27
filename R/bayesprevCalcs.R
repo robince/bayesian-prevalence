@@ -24,7 +24,7 @@
  
 k = 7; n = 50; p = 0.96
  
- int1 <-  hdpi(p, k, n)  
+ int1 <-  bayesprev_hdpi(p, k, n)  
  int1
 
 
@@ -33,7 +33,7 @@ k = 7; n = 50; p = 0.96
  
  k = 11; n = 50; a = 0.0; p = 0.96
  
- int2 <-  hdpi(p, k, n)
+ int2 <-  bayesprev_hdpi(p, k, n)
       
  int2
 
@@ -43,7 +43,7 @@ k = 7; n = 50; p = 0.96
  
  k = 32; n = 50; p = 0.96
  
- int3 <-  hdpi(p, k, n)
+ int3 <-  bayesprev_hdpi(p, k, n)
       
  int3
 
@@ -53,16 +53,16 @@ k = 7; n = 50; p = 0.96
  
  k = 35; n = 50; p = 0.96
  
- int4 <-  hdpi(p, k, n)
+ int4 <-  bayesprev_hdpi(p, k, n)
       
  int4
 
  #   Calculation of lower bounds
 
- gc1 <-  bound(0.05, 7, 50)
- gc2 <-  bound(0.05, 11, 50)
- gc3 <-  bound(0.05, 32, 50)
- gc4 <-   bound(0.05, 35, 50)
+ gc1 <-  bayesprev_bound(0.05, 7, 50)
+ gc2 <-  bayesprev_bound(0.05, 11, 50)
+ gc3 <-  bayesprev_bound(0.05, 32, 50)
+ gc4 <-  bayesprev_bound(0.05, 35, 50)
 
  c(gc1, gc2, gc3, gc4)
 
@@ -70,17 +70,17 @@ k = 7; n = 50; p = 0.96
 
  #   Calculation of MAP estimates
 
- map1 <-  map(7, 50)
- map2 <-  map(11, 50)
- map3 <-  map(32, 50)
- map4 <-  map(35, 50)
+ map1 <-  bayesprev_map(7, 50)
+ map2 <-  bayesprev_map(11, 50)
+ map3 <-  bayesprev_map(32, 50)
+ map4 <-  bayesprev_map(35, 50)
     
  c(map1, map2, map3, map4)
     
 #  Plot posterior
 
 xvals <- seq(0, 1, .01)
-pvals <- posterior(xvals, 32, 50)
+pvals <- bayesprev_posterior(xvals, 32, 50)
 plot(xvals, pvals, type ="l", xlab ="x", ylab ="Posterior density")
 
 
