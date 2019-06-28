@@ -8,7 +8,7 @@ This can be applied whenever a number of statistical tests are performed with a 
 
 The total number of tests is `n`, out of which `k` are positive and each test has false positive rate (alpha) `a`. 
 
-These functions assume a uniform prior on the prevalence proportion. The inferred prevalence value gives an estimate of the proportion of the population (from which the specific tests were sampled) which have the tested effect (i.e. would be true positives if tested).  
+These functions assume a uniform prior on the prevalence proportion. The inferred prevalence value gives an estimate of the proportion of the population which have the tested effect (i.e. would be true positives if tested).  
 
 Then:
 
