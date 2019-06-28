@@ -83,14 +83,14 @@ k = sum(datA.indsig);i=3;hy = 0.3;
 b = 1;
 dat = datA;
 % b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
-lh(1) = plot(x, prev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
+lh(1) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
-xmap = prev_map(k,Nsub, a, b);
-pmap = prev_posterior(xmap,k,Nsub, a, b);
+xmap = bayesprev_map(k,Nsub, a, b);
+pmap = bayesprev_posterior(xmap,k,Nsub, a, b);
 plot(xmap, pmap,'.','MarkerSize',20,'Color',co(i,:));
-h = prev_hpdi(0.96,k,Nsub, a, b);
+h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
-h = prev_hpdi(0.5,k,Nsub, a, b);
+h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
 % plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
@@ -98,14 +98,14 @@ k = sum(datB.indsig);i=4;hy = 0.5;
 b = 1;
 dat = datB;
 % b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
-lh(2) = plot(x, prev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
+lh(2) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
-xmap = prev_map(k,Nsub, a, b);
-pmap = prev_posterior(xmap,k,Nsub, a, b);
+xmap = bayesprev_map(k,Nsub, a, b);
+pmap = bayesprev_posterior(xmap,k,Nsub, a, b);
 plot(xmap, pmap,'.','MarkerSize',20,'Color',co(i,:));
-h = prev_hpdi2(0.96,k,Nsub, a, b);
+h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
-h = prev_hpdi2(0.5,k,Nsub, a, b);
+h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
 % plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
@@ -113,14 +113,14 @@ k = sum(datC.indsig);i=5;hy = 0.5;
 b = 1;
 dat = datC;
 % b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
-lh(3) = plot(x, prev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
+lh(3) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
-xmap = prev_map(k,Nsub, a, b);
-pmap = prev_posterior(xmap,k,Nsub, a, b);
+xmap = bayesprev_map(k,Nsub, a, b);
+pmap = bayesprev_posterior(xmap,k,Nsub, a, b);
 plot(xmap, pmap,'.','MarkerSize',20,'Color',co(i,:));
-h = prev_hpdi2(0.96,k,Nsub, a, b);
+h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
-h = prev_hpdi2(0.5,k,Nsub, a, b);
+h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
 % plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
@@ -128,14 +128,14 @@ k = sum(datD.indsig);i=6;hy = 0.3;
 b = 1;
 dat = datD;
 % b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
-lh(4) = plot(x, prev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
+lh(4) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
-xmap = prev_map(k,Nsub, a, b);
-pmap = prev_posterior(xmap,k,Nsub, a, b);
+xmap = bayesprev_map(k,Nsub, a, b);
+pmap = bayesprev_posterior(xmap,k,Nsub, a, b);
 plot(xmap, pmap,'.','MarkerSize',20,'Color',co(i,:));
-h = prev_hpdi2(0.96,k,Nsub, a, b);
+h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
-h = prev_hpdi2(0.5,k,Nsub, a, b);
+h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
 % plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
