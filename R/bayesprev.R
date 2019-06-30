@@ -64,33 +64,44 @@ bayesprev_hdpi <- function(p, k, n, a=0.05, b=1) {
 
 	m1 <- k+1
 	m2 <- n-k+1
-
+	
 	if(m1 ==1) {
-	  endpts <- c(a, qbeta( (1 -prob)*pbeta(a, m1, m2) + prob*pbeta(b, m1, m2), m1, m2 ) ) 
+	  endpts <- c(a, qbeta( (1 -p)*pbeta(a, m1, m2) + p*pbeta(b, m1, m2), m1, m2 ) ) 
 	  return((endpts -a)/(b-a))
 	}
 	 
 	if(m2 ==1) {
-	  endpts <- c( qbeta( prob*pbeta(a, m1, m2) + (1- prob)* pbeta(b, m1, m2), m1, m2 ) , b) 
+	  endpts <- c( qbeta( p*pbeta(a, m1, m2) + (1- p)* pbeta(b, m1, m2), m1, m2 ) , b) 
+	  return( (endpts-a)/(b-a))
+	}
+	
+	if(k<= n*a) {
+	  endpts <- c(a, qbeta( (1 -p)*pbeta(a, m1, m2) + p*pbeta(b, m1, m2), m1, m2 ) ) 
+	  return((endpts -a)/(b-a))
+	}
+	 
+	if(k>= n*b) {
+	  endpts <- c( qbeta( p*pbeta(a, m1, m2) + (1- p)* pbeta(b, m1, m2), m1, m2 ) , b) 
 	  return( (endpts-a)/(b-a))
 	}
 
-	  g <- function(x, m1, m2, a, b, prob ) {
+
+	  g <- function(x, m1, m2, a, b, p ) {
 	  y <- numeric(2)
-	  y[1] <-  pbeta(x[2], m1, m2) - pbeta(x[1], m1, m2) - prob*(pbeta(b, m1, m2) - pbeta(a, m1, m2))
-	  y[2] <- log (dbeta(x[2], m1, m2)) - log(dbeta(x[1], m1, m2))
+	  y[1] <-  pbeta(x[2], m1, m2) - pbeta(x[1], m1, m2) - p*(pbeta(b, m1, m2) - pbeta(a, m1, m2))
+	  y[2] <- log(dbeta(x[2], m1, m2)) - log(dbeta(x[1], m1, m2))
 	  return(y)
 	}
 	   
 	x_init <- numeric(2)
 	   
-	p1 <- (1-prob)/2 
-	p2 <- (1 +prob)/2
+	p1 <- (1-p)/2 
+	p2 <- (1 +p)/2
 	   
 	x_init[1] <- qbeta( (1 -p1)*pbeta(a, m1, m2) + p1* pbeta(b, m1, m2), m1, m2 )
 	x_init[2] <- qbeta( (1 -p2)*pbeta(a, m1, m2) + p2* pbeta(b, m1, m2), m1, m2 )
 	   
-	opt <- nleqslv(x_init, g, control=list(maxit=150), m1=m1, m2=m2, a=a, b=b, p=p)
+	opt <- nleqslv(x_init, g, method ="Newton", control=list(maxit=1000), m1=m1, m2=m2, a=a, b=b, p=p)
 
 	if (opt$termcd ==1)  print("convergence achieved") 
 	if (opt$termcd != 1)  print("failed to converge") 
@@ -98,10 +109,10 @@ bayesprev_hdpi <- function(p, k, n, a=0.05, b=1) {
 	temp <- opt$x
 	if (temp[1] <a) {
 		temp[1] <- a
-		temp[2] <- qbeta( (1 -prob)*pbeta(a, m1, m2) + prob* pbeta(b, m1, m2), m1, m2 )
+		temp[2] <- qbeta( (1 -p)*pbeta(a, m1, m2) + p* pbeta(b, m1, m2), m1, m2 )
 	}
 	if (temp[2] > b) {
-		temp[1] <- qbeta( prob*pbeta(a, m1, m2) + (1-prob)* pbeta(b, m1, m2), m1, m2 )
+		temp[1] <- qbeta( p*pbeta(a, m1, m2) + (1-p)* pbeta(b, m1, m2), m1, m2 )
 		temp[2] <- b
 	}
 	endpts <- (temp -a)/(b-a)
