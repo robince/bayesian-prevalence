@@ -29,3 +29,7 @@ Gives the highest posterior density interval for the population prevalence propo
 Gives the posterior density of the population prevalence proportion computed at values in `x` (vector with values `0<x<1`).
 
 
+## Contact
+
+Robin Ince, robince@gmail.com (Python code, MATLAB code)
+Jim Kay, jimkay049@gmail.com (R code, Technical note on Bayesian prevalence)
