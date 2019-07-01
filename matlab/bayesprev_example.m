@@ -6,6 +6,7 @@ Nsub = 20; % number of particpants
 Nsamp = 100; % trials/samples per participant
 sigma_w = 10; % within-participant SD
 sigma_b = 2; % between-participant SD
+mu_g = 1; % population mean
 
 % generate within-participant data
 submeanstrue = normrnd(mu_g, sigma_b, [Nsub 1]);
@@ -49,7 +50,7 @@ oil = 2;
 iil = 4;
 h = bayesprev_hpdi(0.95,k,n,alpha);
 plot([h(1) h(2)],[pmap pmap],'Color',co(ci,:),'LineWidth',oil)
-h = bayesprev_hpdi(0.5,k,Nsub, a, b);
+h = bayesprev_hpdi(0.5,k,n,alpha);
 plot([h(1) h(2)],[pmap pmap],'Color',co(ci,:),'LineWidth',iil)
 
 xlabel('Population prevalence proportion')
