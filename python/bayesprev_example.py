@@ -58,3 +58,4 @@ plt.hlines(pmap, h[0], h[1],linewidths=iil,colors=col)
 plt.xlabel('Population prevalence proportion')
 plt.ylabel('Posterior density')
 
+plt.show()
