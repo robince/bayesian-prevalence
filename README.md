@@ -31,5 +31,5 @@ Gives the posterior density of the population prevalence proportion computed at 
 
 ## Contact
 
-Robin Ince, robince@gmail.com (Python code, MATLAB code)
-Jim Kay, jimkay049@gmail.com (R code, Technical note on Bayesian prevalence)
+- Robin Ince, robince@gmail.com (Python code, MATLAB code)
+- Jim Kay, jimkay049@gmail.com (R code, Technical note on Bayesian prevalence)

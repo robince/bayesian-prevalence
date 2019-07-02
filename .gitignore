@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# matlab
+*~
+*.swp
+*~
+*.DS_Store
+*.mat
+*.mex*
