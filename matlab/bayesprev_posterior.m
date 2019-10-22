@@ -23,7 +23,7 @@ r = 1;
 s = 1;
 
 theta = a+(b-a).*x;
-% d = makedist('Beta','a',k+1,'b',n-k+s);
+% d = makedist('Beta','a',k+r,'b',n-k+s);
 % d.truncate(a,b);
 % post = d.pdf(x);
 post = (b-a).*betapdf(theta, k+r, n-k+s);
