@@ -4,13 +4,13 @@ Bayesian inference of population prevalence.
 
 This package includes code for Matlab, Python and R implementing Bayesian prevalence inference. 
 
-This can be applied whenever a number of statistical tests are performed with a common false positive rate alpha. For example, a test in each participant during a psychology or neuroimaging experiment, or a test on each single unit recorded during an electrophysiology experiment.
+Consider that a statistical test (with common false positive rate alpha) is performed in each participant in a psychology or neuroimaging experiment, or on each single unit recorded in an electrophysiology experiment. Following this first-level analysis, we can compute the Bayesian estimate of the prevalence of the effect in the population using only three numbers: the total number of tests `n`, out of which `k` are positive, with false positive rate (alpha) `a`. These numbers can be specified directly in a function call or obtained from a variable that indicates the result of applying the individual tests at the first level. The `example_csv` scripts give an example of loading this first-level within-participant signficance data and applying the second-level prevalence functions. 
+ 
+`bayesprev_example.{m,R,py}` simulates data under a hierarchical normal model, applies a t-test against zero within each participant at the first level, and applies Bayesian prevalence inference at the second level. Users can adapt this example to load their own raw data, replace the t-test with any other within-participant statistical test, or load the indicator variable for significance directly and apply the second level test (see also `example_csv`).
+ 
+These functions assume a uniform prior on the prevalence proportion. The inferred prevalence value gives an estimate of the proportion of the population that has the tested effect. For mathematical details of the Bayesian inference procedure see BayesianPrevalence.pdf 
 
-The total number of tests is `n`, out of which `k` are positive and each test has false positive rate (alpha) `a`. 
-
-These functions assume a uniform prior on the prevalence proportion. The inferred prevalence value gives an estimate of the proportion of the population which have the tested effect (i.e. would be true positives if tested).  
-
-Then:
+## Functions
 
 `bayesprev_map(k,n,a)` *Matlab*, *R*  
 `bayesprev.map(k,n,a)` *Python*  
@@ -26,10 +26,5 @@ Gives the highest posterior density interval for the population prevalence propo
 
 `bayesprev_posterior(x,k,n,a)` *Matlab*, *R*  
 `bayesprev.posterior(x,k,n,a)` *Python*  
-Gives the posterior density of the population prevalence proportion computed at values in `x` (vector with values `0<x<1`).
+Gives the posterior density of the population prevalence proportion computed at values in `x` (vector with values `0<x<1`). E.g. (Matlab) `x=linspace(0,1,100);plot(x,bayesprev_posterior(x,k,n,a))`
 
-
-## Contact
-
-- Robin Ince, robince@gmail.com (Python code, MATLAB code)
-- Jim Kay, jimkay049@gmail.com (R code, Technical note on Bayesian prevalence)

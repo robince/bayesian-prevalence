@@ -1,8 +1,4 @@
 %
-% Draft manuscript: 
-% Ince, Kay and Schyns
-% "Reconsidering population inference from a prevalence perspective"
-%
 % Figure 1: Population vs individual inference. For each simulation we sample ?
 % = 50 individual participant mean effects from a normal distribution with
 % population mean ? (A,B: ? = 0; C,D: ? = 1) and between-participant
@@ -36,6 +32,8 @@ load currfig1seed
 rng(s);
 
 % Generate data from heirachical normal distribution
+% and plot per-participant means with standard deviations 
+% together with population distribution
 subplot(3,2,1)
 Nsamp = 20;
 mu_g = 0;
@@ -82,7 +80,6 @@ lh = [];
 k = sum(datA.indsig);i=3;hy = 0.3;
 b = 1;
 dat = datA;
-% b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
 lh(1) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
 xmap = bayesprev_map(k,Nsub, a, b);
@@ -92,12 +89,10 @@ h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
 h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
-% plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
 k = sum(datB.indsig);i=4;hy = 0.5;
 b = 1;
 dat = datB;
-% b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
 lh(2) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
 xmap = bayesprev_map(k,Nsub, a, b);
@@ -107,12 +102,10 @@ h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
 h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
-% plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
 k = sum(datC.indsig);i=5;hy = 0.5;
 b = 1;
 dat = datC;
-% b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
 lh(3) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
 xmap = bayesprev_map(k,Nsub, a, b);
@@ -122,12 +115,10 @@ h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
 h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
-% plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
 k = sum(datD.indsig);i=6;hy = 0.3;
 b = 1;
 dat = datD;
-% b = sampsizepwr('t',[0 sigma_w],max(abs(dat.submeans)),[],dat.Nsamp)
 lh(4) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color',co(i,:));
 hold on
 xmap = bayesprev_map(k,Nsub, a, b);
@@ -137,7 +128,6 @@ h = bayesprev_hpdi(0.96,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',oil)
 h = bayesprev_hpdi(0.5,k,Nsub, a, b);
 plot([h(1) h(2)],[pmap pmap],'Color',co(i,:),'LineWidth',iil)
-% plot([p.g p.g],[0 freqy],'Color',co(i,:))
 
 xlim([0 1])
 

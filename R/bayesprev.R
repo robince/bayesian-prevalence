@@ -45,13 +45,13 @@ bayesprev_bound <- function(p, k, n, a=0.05, b=1) {
 
 	m1 <-  k + 1
 	m2 <- n - k + 1
-	th_c <- qbeta( (1 -p)*pbeta(a, m1, m2) + p* pbeta(b, m1, m2), m1, m2 )
+	th_c <- qbeta( p*pbeta(a, m1, m2) + (1-p)*pbeta(b, m1, m2), m1, m2 )
 	g_c <- (th_c -a)/(b-a)
 	return(g_c)
 }
 
 
-bayesprev_hdpi <- function(p, k, n, a=0.05, b=1) {
+bayesprev_hpdi <- function(p, k, n, a=0.05, b=1) {
 	# Bayesian highest posterior density interval of population prevalence gamma
     # under a uniform prior
 	#
@@ -118,3 +118,6 @@ bayesprev_hdpi <- function(p, k, n, a=0.05, b=1) {
 	endpts <- (temp -a)/(b-a)
 	return(endpts) 
 }
+
+
+  
