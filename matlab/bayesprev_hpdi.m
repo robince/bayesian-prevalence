@@ -22,7 +22,7 @@ end
 r = 1;
 s = 1;
 
-td = makedist('Beta','a',k+1,'b',n-k+s);
+td = makedist('Beta','a',k+r,'b',n-k+s);
 td = td.truncate(a,b);
 
 if k==0
