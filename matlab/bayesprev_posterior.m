@@ -1,4 +1,4 @@
-function post = prev_posterior(x, k, n, a, b)
+function post = bayesprev_posterior(x, k, n, a, b)
 % Bayesian posterior of population prevalence gamma
 % under a uniform prior
 %

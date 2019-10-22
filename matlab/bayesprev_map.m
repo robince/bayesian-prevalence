@@ -1,4 +1,4 @@
-function gamma = prev_map(k, n, a, b)
+function gamma = bayesprev_map(k, n, a, b)
 % Bayesian maximum a posteriori estimate of population prevalence gamma
 % under a uniform prior
 %

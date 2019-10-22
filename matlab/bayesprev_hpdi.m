@@ -1,4 +1,4 @@
-function hpdi = prev_hpdi(p, k, n, a, b)
+function hpdi = bayesprev_hpdi(p, k, n, a, b)
 % Bayesian highest posterior density interval of population prevalence gamma
 % under a uniform prior
 %

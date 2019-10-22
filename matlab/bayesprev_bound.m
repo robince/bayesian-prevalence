@@ -1,4 +1,4 @@
-function g_c = prev_bound(p, k, n, a, b)
+function g_c = bayesprev_bound(p, k, n, a, b)
 % Bayesian lower bound of population prevalence gamma
 % under a uniform prior
 %
