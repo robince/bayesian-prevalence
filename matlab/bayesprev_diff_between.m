@@ -1,4 +1,4 @@
-function [map, post_x, post, hpi] = bayesprev_diff_between(k1, n1, k2, n2, p, a, b, Nsamp)
+function [map, post_x, post_p, hpi, post_samples] = bayesprev_diff_between(k1, n1, k2, n2, p, a, b, Nsamp)
 % Bayesian maximum a posteriori estimate of the difference in prevalence 
 % when the same test is applied to two groups
 %
@@ -24,14 +24,15 @@ end
 if nargin<=5
     a = 0.05;
 end
+if nargin<=7
+    Nsamp = 10000;
+end
 
 % gamma priors = Beta(r,s)
 r1 = 1;
 s1 = 1;
 r2 = 1;
 s2 = 1;
-
-Nsamp = 10000;
 
 the1d = makedist('Beta','a',k1+r1,'b',n1-k1+s1);
 the1d = the1d.truncate(a,b);
@@ -51,13 +52,12 @@ g_diff_post = ksdensity(g_diff_samples,x);
 g_diff_map = x(idx);
 
 map = g_diff_map;
-post = g_diff_post;
+post_p = g_diff_post;
 post_x = x;
-
+post_samples = g_diff_samples;
 if nargin>=5
     hpi = hpdi(g_diff_samples,100*p);
 end
-
 
 function hpdi = hpdi(x, p)
 % HPDI - Estimates the Bayesian HPD intervals
@@ -85,7 +85,7 @@ pts=linspace(0,100-p,100);
 pt1=prctile(x,pts);
 pt2=prctile(x,p+pts);
 cis=abs(pt2-pt1);
-[foo,hpdpi]=min(cis);
+[~,hpdpi]=min(cis);
 if m==1
   hpdi=[pt1(hpdpi); pt2(hpdpi)];
 else

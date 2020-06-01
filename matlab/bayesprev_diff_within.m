@@ -1,4 +1,4 @@
-function [map, post_x, post, hpi] = bayesprev_diff_within(k11, k01, k10, n, p, a, b, Nsamp)
+function [map, post_x, post_p, hpi, post_samples] = bayesprev_diff_within(k11, k01, k10, n, p, a, b, Nsamp)
 % Bayesian maximum a posteriori estimate of the difference in prevalence 
 % when two tests are applied to the same group
 %
@@ -82,8 +82,9 @@ g_diff_post = ksdensity(g_diff_samples,x);
 g_diff_map = x(idx);
 
 map = g_diff_map;
-post = g_diff_post;
+post_p = g_diff_post;
 post_x = x;
+post_samples = g_diff_samples;
 if nargin>=5
     hpi = hpdi(g_diff_samples',100*p);
 end
@@ -115,7 +116,7 @@ pts=linspace(0,100-p,100);
 pt1=prctile(x,pts);
 pt2=prctile(x,p+pts);
 cis=abs(pt2-pt1);
-[foo,hpdpi]=min(cis);
+[~,hpdpi]=min(cis);
 if m==1
   hpdi=[pt1(hpdpi); pt2(hpdpi)];
 else
