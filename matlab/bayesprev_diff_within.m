@@ -1,4 +1,4 @@
-function [map, post_x, post_p, hpi, post_samples] = bayesprev_diff_within(k11, k10, k01, n, p, a, b, Nsamp)
+function [map, post_x, post_p, hpi, probGT, logoddsGT, samples] = bayesprev_diff_within(k11, k10, k01, n, p, a, b, Nsamp)
 % Bayesian maximum a posteriori estimate of the difference in prevalence 
 % when two tests are applied to the same group
 %
@@ -18,11 +18,19 @@ function [map, post_x, post_p, hpi, post_samples] = bayesprev_diff_within(k11, k
 %          above
 % post   : posterior distribution from kernel density fit
 % hpdi   : highest-posterior density interval with coverage p 
+% probGT : estimated posterior probability that the prevalence is higher in group 1
+% logoddsGT : estimated log odds in favour of the hypothesis that the prevalence is 
+%             higher in group 1
+% samples : posterior samples
+
 if nargin<=6
     b = 1;
 end
 if nargin<=5
     a = 0.05;
+end
+if nargin<=4
+    p = 0.96;
 end
 if nargin<=7
     Nsamp = 10000;
@@ -89,10 +97,13 @@ g_diff_map = x(idx);
 map = g_diff_map;
 post_p = g_diff_post;
 post_x = x;
-post_samples = g_diff_samples;
-if nargin>=5
-    hpi = hpdi(g_diff_samples,100*p);
-end
+samples = g_diff_samples;
+hpi = hpdi(g_diff_samples,100*p);
+% Estimate the posterior probability, and logodds, that the prevalence is higher for group 1.
+% Laplace's rule of succession used to avoid estimates of 0 or 1
+probGT = (sum(samples>0)+1)/(Nsamp+2);
+logoddsGT = log(probGT / (1-probGT));
+
 
 
 function hpdi = hpdi(x, p)
