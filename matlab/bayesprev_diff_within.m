@@ -1,10 +1,10 @@
-function [map, post_x, post_p, hpi, post_samples] = bayesprev_diff_within(k11, k01, k10, n, p, a, b, Nsamp)
+function [map, post_x, post_p, hpi, post_samples] = bayesprev_diff_within(k11, k10, k01, n, p, a, b, Nsamp)
 % Bayesian maximum a posteriori estimate of the difference in prevalence 
 % when two tests are applied to the same group
 %
 % k11 : number of participants significant in both tests
-% k01 : number of participants significant in test 2 and not test 1
 % k10 : number of participants significant in test 1 and not test 2
+% k01 : number of participants significant in test 2 and not test 1
 % n   : total number of participants
 % p   : coverage for highest-posterior density interval (in [0 1])
 % a   : alpha value of within-participant test (default=0.05)
