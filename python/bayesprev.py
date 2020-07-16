@@ -8,10 +8,7 @@ from scipy.optimize import fsolve
 r = 1
 s = 1
 
-# truncated beta pdf/cdf/icdf
-tbpdf = lambda x,b1,b2: beta.pdf(x,b1,b2) / (beta.cdf(b,b1,b2)-beta.cdf(a,b1,b2))
-tbcdf = lambda x,b1,b2: (beta.cdf(x,b1,b2)-beta.cdf(a,b1,b2)) / (beta.cdf(b,b1,b2)-beta.cdf(a,b1,b2))
-tbicdf = lambda x,b1,b2: beta.ppf( (1-x)*beta.cdf(a,b1,b2) + x*beta.cdf(b,b1,b2),b1,b2 )
+
 
 
 def map(k, n, a=0.05, b=1):
@@ -83,19 +80,24 @@ def hpdi(p, k, n, a=0.05, b=1):
     b1 = k+r
     b2 = n-k+s
 
+    # truncated beta pdf/cdf/icdf
+    tbpdf = lambda x: beta.pdf(x,b1,b2) / (beta.cdf(b,b1,b2)-beta.cdf(a,b1,b2))
+    tbcdf = lambda x: (beta.cdf(x,b1,b2)-beta.cdf(a,b1,b2)) / (beta.cdf(b,b1,b2)-beta.cdf(a,b1,b2))
+    tbicdf = lambda x: beta.ppf( (1-x)*beta.cdf(a,b1,b2) + x*beta.cdf(b,b1,b2),b1,b2 )
+
     if k==a:
-        x = np.array([a, tbicdf(p,b1,b2)])
+        x = np.array([a, tbicdf(p)])
     elif k==n:
-        x = np.array([tbicdf(1-p,b1,b2), b])
+        x = np.array([tbicdf(1-p), b])
     else:
-        f = lambda x:  np.array([tbcdf(x[1],b1,b2)-tbcdf(x[0],b1,b2)-p, tbpdf(x[1],b1,b2)-tbpdf(x[0],b1,b2)]);
-        x, info, ier, mesg = fsolve(f, np.array([tbicdf((1-p)/2,b1,b2), tbicdf((1+p)/2,b1,b2)]),full_output=True )
+        f = lambda x:  np.array([tbcdf(x[1])-tbcdf(x[0])-p, tbpdf(x[1])-tbpdf(x[0])]);
+        x, info, ier, mesg = fsolve(f, np.array([tbicdf((1-p)/2), tbicdf((1+p)/2)]),full_output=True )
 
     # limit to valid theta values
     if (x[0]<a) or (x[1]<x[0]):
-        x = np.array([a, tbicdf(p,b1,b2)])
+        x = np.array([a, tbicdf(p)])
     if x[1]>b: 
-        x = np.array([tbicdf(1-p,b1,b2), b])
+        x = np.array([tbicdf(1-p), b])
     hpdi = (x-a)/(b-a)
     return hpdi
 
