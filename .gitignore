@@ -108,5 +108,4 @@ venv.bak/
 *.swp
 *~
 *.DS_Store
-*.mat
 *.mex*
