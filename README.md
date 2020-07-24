@@ -18,6 +18,8 @@ There are also functions which return posterior estimates and samples for the di
 
 BayesianPrevalence.pdf and BayesianPrevalenceDifference.pdf give provide more mathematical detail of the methods. 
 
+The folder `paper` contains Matlab scripts to generate the figures in the manuscript. 
+
 ## Functions
 
 `bayesprev_map(k,n,a,b)` *Matlab*, *R*  
