@@ -6,9 +6,9 @@ This package includes code for Matlab, Python and R implementing Bayesian preval
 
 Bayesian inference of population prevalence
 RAA Ince, JW Kay & PG Schyns
-biorxiv: 
+biorxiv: https://doi.org/10.1101/2020.07.08.191106
 
-Consider that a statistical test (with common false positive rate alpha) is performed in each participant in a psychology or neuroimaging experiment, or on each single unit recorded in an electrophysiology experiment. Following this first-level analysis, we can compute the Bayesian estimate of the prevalence of the effect in the population using only three numbers: the total number of tests `n`, out of which `k` are positive, with false positive rate (alpha) `a`. These numbers can be specified directly in a function call or obtained from a variable that indicates the result of applying the individual tests at the first level. The `example_csv` scripts give an example of loading this first-level within-participant signficance data and applying the second-level prevalence functions. 
+Consider that a statistical test (with common false positive rate alpha) is performed in each participant in a psychology or neuroimaging experiment, or on each single unit recorded in an electrophysiology experiment. Following this first-level analysis, we can compute the Bayesian estimate of the prevalence of true positive results to such a test in the population using only three numbers: the total number of tests `n`, out of which `k` are positive, with false positive rate (alpha) `a`. These numbers can be specified directly in a function call or obtained from a variable that indicates the result of applying the individual tests at the first level. The `example_csv` scripts give an example of loading this first-level within-participant signficance data and applying the second-level prevalence functions. 
  
 `bayesprev_example.{m,R,py}` simulates data under a hierarchical normal model, applies a t-test against zero within each participant at the first level, and applies Bayesian prevalence inference at the second level. Users can adapt this example to load their own raw data, replace the t-test with any other within-participant statistical test, or load the indicator variable for significance directly and apply the second level test (see also `example_csv`).
  
