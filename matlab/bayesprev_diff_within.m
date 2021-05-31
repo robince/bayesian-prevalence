@@ -8,6 +8,7 @@ function [map, post_x, post_p, hpi, probGT, logoddsGT, samples] = bayesprev_diff
 % n   : total number of participants
 % p   : coverage for highest-posterior density interval (in [0 1])
 % a   : alpha value of within-participant test (default=0.05)
+%       can be a length 2 array for the two tests if different
 % b   : sensitivity/beta of within-participant test (default=1)
 % Nsamp : number of samples from the posterior
 %

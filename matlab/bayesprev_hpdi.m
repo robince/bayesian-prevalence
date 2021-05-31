@@ -32,6 +32,7 @@ elseif k==n
 else
     f = @(x) [td.cdf(x(2))-td.cdf(x(1))-p, td.pdf(x(2))-td.pdf(x(1))];
     opt.Display = 'off';
+    opt.FunctionTolerance = 1e-10;
     [x, fval, exitflag, output] = fsolve(f, [td.icdf((1-p)/2) td.icdf((1+p)/2)],opt);
 end
 
