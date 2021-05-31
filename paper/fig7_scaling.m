@@ -1,8 +1,24 @@
-% Ince, Kay and Schyns
+% Ince, Paton, Kay and Schyns
 % "Bayesian inference of population prevalence"
 % biorxiv: https://doi.org/10.1101/2020.07.08.191106
 %
-% Figure 2: Characterisation of Bayesian prevalence inference.  
+% Figure 7: Characterisation of Bayesian prevalence inference.  
+% A,B,C: We consider the binomial model of within-participant testing for 
+% three ground truth population proportions: 25%, 50% and 75% (blue, 
+% orange, yellow, respectively). We show how A: the Bayesian MAP estimate, 
+% B: 95% Bayesian lower bound and C: 96% HPDI width, scale with the number 
+% of participants. Lines show theoretical expectation, coloured regions 
+% show +/- 1 s.d.. D,E,F: We consider the population model from 
+% Figure 1C,D (μ=1). D: Power contours for the population inference using 
+% a t-test (Baker et al. 2020). Colour scale shows statistical power 
+% (probability of rejecting the null hypothesis). E: Contours of average 
+% Bayesian MAP estimate for γ. Colour scale shows MAP prevalence 
+% proportion.  F: Contours of average 95% Bayesian lower bound for γ. 
+% Colour scale shows lower bound prevalence. From the prevalence 
+% perspective, the number of trials obtained per participant has a larger 
+% effect on the resulting population inference than does the number of 
+% participants.
+
 
 figure
 

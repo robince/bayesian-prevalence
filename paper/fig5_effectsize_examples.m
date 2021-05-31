@@ -1,8 +1,15 @@
-% Ince, Kay and Schyns
+% Ince, Paton, Kay and Schyns
 % "Bayesian inference of population prevalence"
 % biorxiv: https://doi.org/10.1101/2020.07.08.191106
 %
-% Figure 4: One-sided prevalence as a function of effect size.    
+% Figure 5: One-sided prevalence as a function of effect size. 
+% We consider the same simulated systems shown in Figure 1, showing both 
+% right-tailed (E_p>E ̂) and left-tailed (E_p<E ̂) prevalence as a function o
+% f effect size. Orange lines show the effect size corresponding to the 
+% two-sided α=0.05 within-participant test, as used in Figure 1. Dashed 
+% lines show the effect size corresponding to the ground truth of the 
+% simulation. A,B: μ_pop=0,  C,D: μ_pop=1. A,C: T =20 trials, 
+% B,D: T =500 trials. Black line shows MAP, shaded region shows 96% HPDI.   
 
 Nsub = 50;
 sigma_w = 10;
@@ -12,7 +19,7 @@ figure
 ax = [];
 
 % s = rng;
-load('currfig4seed.mat')
+load('fig5seed.mat')
 rng(s)
 % MODEL A
 Nsamp = 20;

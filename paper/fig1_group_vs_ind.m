@@ -1,5 +1,5 @@
 %
-% Ince, Kay and Schyns
+% Ince, Paton, Kay and Schyns
 % "Bayesian inference of population prevalence"
 % biorxiv: https://doi.org/10.1101/2020.07.08.191106
 %
@@ -9,7 +9,7 @@
 % between-participant standard deviation σ_b=2. Within each participant, 
 % T trials (A,C: T=20; B,D: T=500) are drawn from a normal distribution 
 % with the participant-specific mean and a common within-participant 
-% standard deviation σ_w=10 (Baker et al. 2019). Orange and blue indicate, 
+% standard deviation σ_w=10 (Baker et al. 2020). Orange and blue indicate, 
 % respectively, exceeding or not exceeding a p=0.05 threshold for a t-test 
 % at the population level (on the within-participant means, population 
 % normal density curves) or at the individual participant level (individual
@@ -24,6 +24,8 @@
 % Baker, Vilidaite, Lygo, Smith, Flack, Gouws and Andrews
 % "Power contours: optimising sample size and precision in experimental
 % psychology and human neuroscience"
+% Psychological Methods
+% https://doi.org/10.1037/met0000337
 % http://arxiv.org/abs/1902.06122
 
 x = [];
@@ -35,8 +37,8 @@ sigma_w = 10;
 sigma_b = 2;
 
 % s = rng;
-% save('currfig1seed','s')
-load currfig1seed
+% save('fig1seed','s')
+load fig1seed
 rng(s);
 
 % Generate data from heirachical normal distribution

@@ -1,8 +1,22 @@
-% Ince, Kay and Schyns
+% Ince, Paton, Kay and Schyns
 % "Bayesian inference of population prevalence"
 % biorxiv: https://doi.org/10.1101/2020.07.08.191106
-%
-% Figure 3: Bayesian inference of difference of prevalence.   
+% 
+% Figure 3: Bayesian inference of difference of prevalence. 
+% A,B: We consider two independent groups of participants with population 
+% prevalence of true positives [γ_1,γ_2] of [25% 25%] (blue), 
+% [25% 50%] (red) and [25% 75%] (yellow). We show how A: the Bayesian MAP 
+% estimate, and B: 96% HPDI width, of the estimated between-group 
+% prevalence difference γ_1-γ_2 scale with the number of participants. 
+% C,D: We consider two tests applied to the same sample of participants. 
+% Here, each simulation is parameterised by the population prevalence of 
+% true positives for the two tests, [γ_1,γ_2], as well as ρ_12, the 
+% correlation between the (binary) test results across the population. We 
+% show this for [50% 50%] with ρ_12=0.2 (blue), [50% 0%] with ρ_12=0 (red), 
+% and [75% 50%] with ρ_12=-0.2 (yellow). We show how C: the Bayesian MAP 
+% estimate, and D: 96% HPDI width, of the estimated within-group prevalence 
+% difference γ_1-γ_2 scale with the number of participants.
+
 a = 0.05;
 b = 1;
 
