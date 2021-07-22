@@ -1,262 +1,226 @@
 % Ince, Paton, Kay and Schyns
 % "Bayesian inference of population prevalence"
 % biorxiv: https://doi.org/10.1101/2020.07.08.191106
+%
+% Figure 6: Examples of different effect size prevalence curves with 
+% similar p=0.05 prevalence. EEG traces are simulated for 100 trials from 
+% 20 participants as white noise [N(0,1)] with an additive Gaussian 
+% activation (σ = 20 ms) with amplitudes drawn from a uniform distribution. 
+% For each simulation, mean traces are shown per participant (upper left 
+% panel). A within-participant t-test is performed at each time point and 
+% for each participant separately (right hand panel); the blue points show 
+% the maximum T-statistic over time for each participant, and the dashed 
+% line shows the p=0.05 Bonferroni corrected threshold. Lower right panel 
+% shows posterior distribution of population prevalence for an effect in 
+% the analysis window. Black curves (lower left panel) show the prevalence 
+% (MAP, shaded area 96% HPDI) as a function of effect size threshold. A: 
+% A weak early effect is simulated in all participants (peak time 
+% uniformly distributed 100-150ms) B: In addition to the same early effect,
+% a stronger, longer (σ = 40 ms) and more temporally variable later effect 
+% is simulated in 10 participants, (peak times 250-450ms). C: Early events 
+% are simulated with the same timing as A, but each participant has a 
+% different maximum amplitude (participants ordered by effect size). All 
+% three simulations have similar prevalence of p=0.05 effects, but show 
+% differing patterns of prevalence over different effect size thresholds. 
 
-% Figure 6: Examples of different effect size prevalence curves. 
-% A,B,C: N=50 participant effects are drawn from a single Gaussian 
-% distribution with μ_pop=5,10,7 and σ_b=2,2,0 respectively. All three 
-% simulated data sets have the same posterior population prevalence 
-% (left hand panels, dot = MAP, thick line = 50% HPDI, 
-% thin line = 96% HPDI), but the prevalence effect size curves show 
-% different profiles (right hand panels, black line = MAP, grey shaded 
-%region = 96% HPDI). D: N=50 participant effects are drawn from a single 
-%Gaussian with μ_pop=1, σ_b=2. E,F: 25 participants are simulated with no 
-% effect. The other 25 participants are drawn from a Gaussian distribution 
-% with E: μ_pop=5,σ_b=3 and F: μ_pop=10,σ_b=1. D,E,F: All three simulated 
-% data sets have the same posterior population prevalence (left hand 
-% panels), but the prevalence effect size curves show different profiles 
-% (right hand panels). k=500 for all simulations. Orange lines show the 
-% effect size corresponding to a one-sided α=0.05 within-participant 
-%threshold. 
+% s = rng;
+% save('figsimeeges','s')
+load figsimeeges
+rng(s);
 
+Ntrl = 100;
+% Fs = 1000Hz (1ms bins)
+Ntime = 600;
+Nsubeff = 10;
+Nsubnoeff = 10;
+Nsub = Nsubeff + Nsubnoeff;
+
+% early weak effect in all participants
+effect_range_width = 50;
+effect_range_start = 100;
+sub_effect_time = round(rand(Nsub,1)*effect_range_width + effect_range_start);
+effect_size = 0.2;
+
+% generate data
+dat = randn(Ntime,Ntrl,Nsub);
+% add effect
+effect_bins = 40;
+effect_sd = 20;
+for si=1:Nsub
+    effect = normpdf(-effect_bins:effect_bins,0,effect_sd)';
+    effect = effect./max(effect);
+    % uniformly distributed random ampltiude on each trial 0-effect_size
+    trial_amp = effect_size*rand(1,Ntrl);
+    idx = sub_effect_time(si)-effect_bins:sub_effect_time(si)+effect_bins;
+    dat(idx,:,si) = dat(idx,:,si) + effect.*trial_amp;
+end
+
+stemlim = [0 20];
+plot_results(dat, Nsub, Ntrl, Ntime, stemlim)
+
+% add a later variable strong effect in some participants
+effect_range_width = 200;
+effect_range_start = 250;
+sub_effect_time = round(rand(Nsub,1)*effect_range_width + effect_range_start);
+% sub_effect_time = sort(sub_effect_time,'descend');
+effect_size = 1;
+% add effect
+effect_bins = 80;
+effect_sd = 40;
+for si=1:Nsubeff
+    effect = normpdf(-effect_bins:effect_bins,0,effect_sd)';
+    effect = effect./max(effect);
+    % uniformly distributed random ampltiude on each trial 0-effect_size
+    trial_amp = effect_size*rand(1,Ntrl);
+    idx = sub_effect_time(si)-effect_bins:sub_effect_time(si)+effect_bins;
+    dat(idx,:,si) = dat(idx,:,si) + effect.*trial_amp;
+end
+
+plot_results(dat, Nsub, Ntrl, Ntime, stemlim)
+
+% early weak effect in all participants, subject specific effect size
+effect_range_width = 50;
+effect_range_start = 100;
+sub_effect_time = round(rand(Nsub,1)*effect_range_width + effect_range_start);
+effect_size = linspace(1,0,Nsub);
+
+% generate data
+dat = randn(Ntime,Ntrl,Nsub);
+% add effect
+effect_bins = 40;
+effect_sd = 20;
+for si=1:Nsub
+    effect = normpdf(-effect_bins:effect_bins,0,effect_sd)';
+    effect = effect./max(effect);
+    % uniformly distributed random ampltiude on each trial 0-effect_size
+    trial_amp = effect_size(si)*rand(1,Ntrl);
+    idx = sub_effect_time(si)-effect_bins:sub_effect_time(si)+effect_bins;
+    dat(idx,:,si) = dat(idx,:,si) + effect.*trial_amp;
+end
+plot_results(dat, Nsub, Ntrl, Ntime, stemlim)
+
+
+
+function plot_results(dat, Nsub, Ntrl, Ntime, stemlim)
+
+% filter <30Hz as typical ERP analysis
+Fs = 1000;
+[b,a] = butter(3,30/(Fs/2),'low');
+for si=1:Nsub
+    for ti=1:Ntrl
+        dat(:,ti,si) = filtfilt(b,a,dat(:,ti,si));
+    end
+end
+
+% group results (t-test across participants at each time point)
+group_t = zeros(Ntime,1);
+group_p = zeros(Ntime,1);
+for ti=1:Ntime
+    [sig p ci stats] = ttest(squeeze(mean(dat(ti,:,:),2)));
+    group_t(ti) = stats.tstat;
+    group_p(ti) = p;
+end
+
+% group results (average over time points within each participant)
+tavg = squeeze(mean(dat));
+[sig p ci stats] = ttest(mean(tavg));
+group_tavg_t = stats.tstat;
+group_tavg_p = p;
+
+% within participant results
+ind_t = zeros(Ntime,Nsub);
+ind_p = zeros(Ntime,Nsub);
+for si=1:Nsub
+    for ti=1:Ntime
+        [sig p ci stats] = ttest(dat(ti,:,si));
+        ind_t(ti,si) = stats.tstat;
+        ind_p(ti,si) = p;
+    end
+end
+ind_sig = ind_p<0.05/Ntime;
+
+% % sig time points, unc and bonf
+% [sum(group_p<0.05) sum(group_p<0.05/Ntime)]
+% % sig subjects, unc and bonf 
+% [sum(sum(ind_p<0.05)>0) sum(min(ind_p)<0.05/Ntime)]
 
 % close all
 figure
-
-Ngrp1 = 50;
-Ngrp2 = 50;
-
-sigma_w = 10;
-Nsamp = 500;
-
-p = 0.05;
-
-load fig6seed
-rng(s);
-
-% group 1 
-% all members show an effect
-% narrow between participant variance
-% medium effect size
-ax = subplot(3,3,[2 3]);
-g1_sig_b = 2;
-g1_mu_effect = 5;
-rawdat = generate_data(g1_mu_effect, g1_sig_b, sigma_w, Nsamp, Ngrp1);
-datA = do_stats(rawdat, Nsamp, Ngrp1);
-do_plot(datA,Nsamp,g1_mu_effect,sigma_w,1);
-k1 = sum(datA.indt>tinv(1-p/2, 49));
-title(sprintf('group 1, k=%d',k1));
-% ylabel('Prevalence')
-
-
-% group 2
-% only 25% of members show an effect
-% narrow between participant variance for this effect
-% strong effect size
-ax = subplot(3,3,[5 6]);
-g2_sig_b = 2;
-g2_mu_effect1 = 2;
-g2_mu_effect2 = 10;
-g2_prev = 0;
-g2_Neff = round(Ngrp2*g2_prev);
-g2_Nnoeff = Ngrp2 - g2_Neff;
-rawdat1 = generate_data(g2_mu_effect1, g2_sig_b, sigma_w, Nsamp, g2_Neff);
-rawdat2 = generate_data(g2_mu_effect2, g2_sig_b, sigma_w, Nsamp, g2_Nnoeff);
-rawdat = cat(2,rawdat1,rawdat2);
-datB = do_stats(rawdat, Nsamp, Ngrp1);
-do_plot(datB,Nsamp,g2_mu_effect2,sigma_w,1);
-k2 = sum(datB.indt>tinv(1-p/2, 49));
-title(sprintf('group 2, k=%d',k2));
-% ylabel('Prevalence')
-
-% group 3
-ax = subplot(3,3,[8 9]);
-g3_sig_b = 0;
-g3_mu_effect = 7;
-rawdat = generate_data(g3_mu_effect, g3_sig_b, sigma_w, Nsamp, Ngrp1);
-datC = do_stats(rawdat, Nsamp, Ngrp1);
-do_plot(datC,Nsamp,g1_mu_effect,sigma_w,1);
-k3 = sum(datC.indt>tinv(1-p/2, 49));
-title(sprintf('group 3, k=%d',k3));
-xlabel(sprintf('T(%d)',Nsamp-1));
-
-
-% %%
-% figure
-ax = [];
-ax(1) = subplot(3,3,1);
-prev_plot(k1,Ngrp1);
-ylabel('Prevalence')
-
-ax(2) = subplot(3,3,4);
-prev_plot(k2,Ngrp1);
-ylabel('Prevalence')
-
-ax(3) = subplot(3,3,7);
-prev_plot(k3,Ngrp1);
-ylabel('Prevalence')
-
-set(ax,'XTick',1)
-set(ax,'XTickLabel',[])
-set(ax,'ylim',[0.8 1])
-
-
-%%
-figure
-
-
-% group 1 
-% 50% prevalence single dist
-ax = subplot(3,3,[2 3]);
-g1_sig_b = 2;
-g1_mu_effect = 1;
-rawdat = generate_data(g1_mu_effect, g1_sig_b, sigma_w, Nsamp, Ngrp1);
-datA = do_stats(rawdat, Nsamp, Ngrp1);
-do_plot(datA,Nsamp,g1_mu_effect,sigma_w,1);
-k1 = sum(datA.indt>tinv(1-p/2, 49));
-title(sprintf('group 1, k=%d',k1));
-% ylabel('Prevalence')
-
-
-% group 2
-ax = subplot(3,3,[5 6]);
-g2_sig_b = 3;
-g2_mu_effect1 = 0;
-g2_mu_effect2 = 5;
-g2_prev = 0.5;
-g2_Neff = round(Ngrp2*g2_prev);
-g2_Nnoeff = Ngrp2 - g2_Neff;
-rawdat1 = generate_data(g2_mu_effect1, 0, sigma_w, Nsamp, g2_Nnoeff);
-rawdat2 = generate_data(g2_mu_effect2, g2_sig_b, sigma_w, Nsamp, g2_Neff);
-rawdat = cat(2,rawdat1,rawdat2);
-datB = do_stats(rawdat, Nsamp, Ngrp1);
-do_plot(datB,Nsamp,g2_mu_effect2,sigma_w,1);
-k2 = sum(datB.indt>tinv(1-p/2, 49));
-title(sprintf('group 2, k=%d',k2));
-% ylabel('Prevalence')
-
-% group 3
-ax = subplot(3,3,[8 9]);
-g2_sig_b = 1;
-g2_mu_effect1 = 0;
-g2_mu_effect2 = 10;
-g2_prev = 0.5;
-g2_Neff = round(Ngrp2*g2_prev);
-g2_Nnoeff = Ngrp2 - g2_Neff;
-rawdat1 = generate_data(g2_mu_effect1, 0, sigma_w, Nsamp, g2_Nnoeff);
-rawdat2 = generate_data(g2_mu_effect2, g2_sig_b, sigma_w, Nsamp, g2_Neff);
-rawdat = cat(2,rawdat1,rawdat2);
-datC = do_stats(rawdat, Nsamp, Ngrp1);
-do_plot(datC,Nsamp,g2_mu_effect2,sigma_w,1);
-k3 = sum(datC.indt>tinv(1-p/2, 49));
-title(sprintf('group 3, k=%d',k2));
-xlabel(sprintf('T(%d)',Nsamp-1));
-
-
-% %%
-% figure
-ax = [];
-ax(1) = subplot(3,3,1);
-prev_plot(k1,Ngrp1);
-ylabel('Prevalence')
-
-ax(2) = subplot(3,3,4);
-prev_plot(k2,Ngrp1);
-ylabel('Prevalence')
-
-ax(3) = subplot(3,3,7);
-prev_plot(k3,Ngrp1);
-ylabel('Prevalence')
-
-set(ax,'XTick',1)
-set(ax,'XTickLabel',[])
-set(ax,'ylim',[0 1])
-
-%%
-
-
-function prev_plot(k,Nsub)
-i=1;
-oil = 3;
-iil = 8;
-hy = 0.3;
-a = 0.05;
-b = 1;
+cm = flipud(cbrewer('div','RdBu',128));
 co = get(gca,'ColorOrder');
-lw = 2;
-hold on
 
-xmap = bayesprev_map(k, Nsub, a, b);
-pmap = bayesprev_posterior(xmap, k, Nsub, a, b);        %#ok<NASGU>
+imah = subplot(3,3,[1 2 4 5]);
+imagesc(squeeze(mean(dat,2))')
+colorbar
+colormap(cm)
+caxis([-1 1]*max(abs(caxis)))
+set(gca,'YDir','normal')
+yl = ylim;
+% axis square
+ylabel('Participant')
 
-yp = 1;
-plot(yp, xmap, '.','MarkerSize',20,'Color',co(i,:));
-
-h = bayesprev_hpdi(0.96,k, Nsub, a, b);
-plot([yp yp],[h(1) h(2)],'Color',[co(i,:) 0.3],'LineWidth',oil)
-
-h = bayesprev_hpdi(0.5,k,Nsub, a, b);
-plot([yp yp],[h(1) h(2)],'Color',[co(i,:) 0.3],'LineWidth',iil)
-
-
-end
-
-function ax = do_plot(dat,Nsamp,mu_g,sigma_w,pi)
-[es pmap hpdi] = prev_curve_onesided(dat,1);
+ah = subplot(3,3,[7 8]);
+d.indt = max(ind_t);
+d.Nsamp = size(dat,2);
+d.Nsub = size(dat,3);
+[es pmap hpdi] = prev_curve_onesided(d,1);
 posbar = hpdi(2,:) - pmap;
 negbar = pmap - hpdi(1,:);
 shadedErrorBar(es,pmap,cat(1,posbar,negbar))
 % xline(mu_g./(sigma_w./sqrt(Nsamp)),'b')
-p = 0.05;
-xline(tinv(1-p/2, Nsamp-1),'r');
-xline(tinv(p/2,Nsamp-1),'r');
+p = 0.05 ./ Ntime;
+xline(tinv(1-p, d.Nsamp-1),'r');
+% xline(tinv(p/2,d.Nsamp-1),'r');
 ylim([0 1])
-xlim([0 30])
-% title('Right-tailed prevalence')
+xlim([0 20])
+xlabel('Threshold T(99)')
+ylabel('Prevalence (> Threshold)')
+cb = colorbar;
+set(cb,'Vis','off')
 
+subplot(3,3,[3 6])
+% plot(max(ind_t,[],1),'s','MarkerSize',10,'LineWidth',2)
+stem(max(ind_t,[],1),'filled','LineWidth',1);
+set(gca,'view',[90 -90])
+ylim(stemlim)
+xlim(yl)
+ylabel('T(99)')
+h = hline(tinv(1-(0.05/Ntime),Ntrl-1),'k--');
+% set(h,'LineWidth',1.5)
 
-% ax(2) = subplot(n,m,pi+m);
-% [es pmap hpdi] = prev_curve_onesided(dat,-1);
-% posbar = hpdi(2,:) - pmap;
-% negbar = pmap - hpdi(1,:);
-% shadedErrorBar(es,pmap,cat(1,posbar,negbar))
-% title('Left-tailed prevalence')
-% xline(mu_g./(sigma_w./sqrt(Nsamp)),'b')
-% p = 0.05;
-% xline(tinv(1-p/2, Nsamp-1),'r');
-% xline(tinv(p/2,Nsamp-1),'r');
-% linkaxes(ax,'xy')
-% ylim([0 0.8])
+subplot(3,3,9)
+k = sum((min(ind_p)<0.05/Ntime));
+i=1;
+oil = 5;
+iil = 15;
+hy = 0.3;
+a = 0.05;
+b = 1;
+co = get(gca,'ColorOrder');
+x = linspace(0,1,100);
+lw = 2;
+
+lh(1) = plot(x, bayesprev_posterior(x, k, Nsub, a, b),'Color','k','LineWidth',lw);
+hold on
+
+xmap = bayesprev_map(k, Nsub, a, b);
+pmap = bayesprev_posterior(xmap, k, Nsub, a, b);    
+h = bayesprev_hpdi(0.96,k, Nsub, a, b);
+
+% yp = pmap;
+yp = 0.5;
+yp = 0.25;
+c = [0 0 0 0.4];
+plot(xmap, yp,'.','MarkerSize',20,'Color','k');
+plot([h(1) h(2)],[yp yp],'Color',c,'LineWidth',oil)
+h = bayesprev_hpdi(0.5,k,Nsub, a, b);
+plot([h(1) h(2)],[yp yp],'Color',c,'LineWidth',iil)
+% xline(xmap,'k')
+box off
+xlabel('Population Prevalence')
+ylabel('Posterior Density')
+
 end
 
-% generate data from heirachical normal model
-function dat = generate_data(mu_g, sigma_b, sigma_w, Nsamp, Nsub)
-% mu_g - ground truth group mean
-% sigma_b - between participant standard deviation
-% sigma_w - within participant standard deviation
-% Nsamp - number of trials per participant
-% Nsub - number of participants
 
-% generate individual subject means from population normal distribution
-submeanstrue = normrnd(mu_g, sigma_b, [Nsub 1]);
-dat = zeros(Nsamp, Nsub);
-for si=1:Nsub
-    % generate within-participant data
-    dat(:,si) = normrnd(submeanstrue(si), sigma_w, [Nsamp 1]);
-end
-end
 
-function dat = do_stats(rawdat, Nsamp, Nsub)
-% generate data from heirachical normal model
-dat = [];
-dat.Nsub = Nsub;
-dat.Nsamp = Nsamp;
-dat.indsig = false(1,Nsub);
-dat.indt = zeros(1,Nsub);
-for si=1:Nsub
-    % within-participant t-test significance
-    [dat.indsig(si) p ci stats] = ttest(rawdat(:,si));
-    % within-participant t-score
-    dat.indt(si) = stats.tstat;
-end
-end
