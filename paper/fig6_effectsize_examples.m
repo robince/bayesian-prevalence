@@ -23,9 +23,7 @@
 % three simulations have similar prevalence of p=0.05 effects, but show 
 % differing patterns of prevalence over different effect size thresholds. 
 
-% s = rng;
-% save('figsimeeges','s')
-load figsimeeges
+load fig6seed
 rng(s);
 
 Ntrl = 100;
