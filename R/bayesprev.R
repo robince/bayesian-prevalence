@@ -1,3 +1,7 @@
+
+# nleqslv package required for HPDI optimization
+library(nleqslv)
+
 bayesprev_map <- function(k, n, a=0.05, b=1) {
 	# Bayesian maximum a posteriori estimate of population prevalence gamma
 	# under a uniform prior
