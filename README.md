@@ -4,9 +4,9 @@ Bayesian inference of population prevalence.
 
 This package includes code for Matlab, Python and R implementing Bayesian prevalence inference as described in:
 
-Bayesian inference of population prevalence
-RAA Ince, JW Kay & PG Schyns
-biorxiv: https://doi.org/10.1101/2020.07.08.191106
+Bayesian inference of population prevalence  
+RAA Ince, AT Paton, JW Kay & PG Schyns  
+(2021) *eLife* 10:e62461 [doi: 10.7554/eLife.62461](https://doi.org/10.7554/eLife.62461)
 
 Consider that a statistical test (with common false positive rate alpha) is performed in each participant in a psychology or neuroimaging experiment, or on each single unit recorded in an electrophysiology experiment. Following this first-level analysis, we can compute the Bayesian estimate of the prevalence of true positive results to such a test in the population using only three numbers: the total number of tests `n`, out of which `k` are positive, with false positive rate (alpha) `a`. These numbers can be specified directly in a function call or obtained from a variable that indicates the result of applying the individual tests at the first level. The `example_csv` scripts give an example of loading this first-level within-participant signficance data and applying the second-level prevalence functions. 
  
