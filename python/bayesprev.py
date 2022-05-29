@@ -206,7 +206,7 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     m00 = k00 + r00
 
     r11 = (beta.cdf(0, m11, m10+m01+m00), beta.cdf(b, m11, m10+m01+m00))
-    if np.isclose(*r11,rtol=1e-12,atol=1e-12):
+    if np.any(np.isclose(*r11,rtol=1e-12,atol=1e-12)):
         res = {x: np.NaN for x in ["map","post_x","post","hpdi","probGT","logoddsGT","samples"]}
         return res
     # samples from the truncated Dirichlet posterior
@@ -217,7 +217,7 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     hi = (b-th11)/(1-th11)
 
     r10 = beta.cdf(lo, m10, m01+m00), beta.cdf(hi, m10, m01+m00)
-    if np.isclose(*r10,rtol=1e-12,atol=1e-12):
+    if np.any(np.isclose(*r10,rtol=1e-12,atol=1e-12)):
         res = {x: np.NaN for x in ["map","post_x","post","hpdi","probGT","logoddsGT","samples"]}
         return res
     z10 = np.random.uniform(r10[0], r11[0], Nsamp)
@@ -227,7 +227,7 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     lo = np.maximum( (a-th11)/(1-th11-th10), 0 )
     hi = np.minimum( (b-th11)/(1-th11-th10), 1 )
     r01 = (beta.cdf(lo, m01, m00), beta.cdf(hi, m01, m00))
-    if np.isclose(*r01,rtol=1e-12,atol=1e-12):
+    if np.any(np.isclose(*r01,rtol=1e-12,atol=1e-12)):
         res = {x: np.NaN for x in ["map","post_x","post","hpdi","probGT","logoddsGT","samples"]}
         return res
     z01 = np.random.uniform(r01[0], r01[1], Nsamp)
