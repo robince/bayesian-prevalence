@@ -220,7 +220,7 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     if np.any(np.isclose(*r10,rtol=1e-12,atol=1e-12)):
         res = {x: np.NaN for x in ["map","post_x","post","hpdi","probGT","logoddsGT","samples"]}
         return res
-    z10 = np.random.uniform(r10[0], r11[0], Nsamp)
+    z10 = np.random.uniform(r10[0], r10[1], Nsamp)
     u10 = beta.ppf(z10, m10, m01+m00)
     th10 = (1-th11)*u10
 
