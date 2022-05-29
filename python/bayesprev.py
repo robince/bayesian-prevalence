@@ -138,8 +138,11 @@ def diff_between(k1, n1, k2, n2, p=0.96, a=0.05, b=1, Nsamp=10000):
     m22 = n2 - k2 + s2
 
     # Generate truncated beta samples
-    th1 = beta.ppf(np.random.uniform(beta.cdf(a,m11,m12),beta.cdf(b,m11,m12), Nsamp), m11, m12)
-    th2 = beta.ppf(np.random.uniform(beta.cdf(a,m21,m22),beta.cdf(b,m21,m22), Nsamp), m21, m22)
+    # fix numerical issue
+    e = 0.001
+    th1 = beta.ppf(np.random.uniform(beta.cdf(a,m11,m12)-e,beta.cdf(b,m11,m12)-e/100, Nsamp), m11, m12)
+    th2 = beta.ppf(np.random.uniform(beta.cdf(a,m21,m22)-e,beta.cdf(b,m21,m22)-e/100, Nsamp), m21, m22)
+
 
     # vector of estimates of prevalence differences
     samples = (th1 - th2) / (b-a)
