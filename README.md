@@ -46,6 +46,23 @@ Returns MAP, kernel density fit to posterior density, HPDI of p, probability `g1
 `bayesprev.diff_within(k11,k10,k01,n,p,a,b,Nsamp)` *Python*  
 Returns MAP, kernel density fit to posterior density, HPDI of p, probability `g1-g2>0`, log odds `g1>g2`, and posterior samples for the population prevalence difference `g1-g2` for two tests applied to the same sample. 
 
+## Installation
+
+### Python
+
+`pip install bayesprev`
+
+### Matlab
+
+Clone or download this repository, then in Matlab add folder to path: 
+
+`addpath('/path/to/bayesprev/matlab')`
+
+### R
+
+Clone or download this repository, then in R:
+
+`source("bayesprev.R")`
 
 ## Contact
 
