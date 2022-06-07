@@ -10,7 +10,7 @@ then we can estimate the population prevalence of a true positive effect.
 This is the population level within-participant replication probability. 
 
 """
-__version__ = "0.1"
+__version__ = "0.1.0"
 
 import numpy as np
 import scipy as sp
