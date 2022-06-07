@@ -8,6 +8,10 @@ authors = [{name = "Robin Ince", email = "robince@gmail.com"}]
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
 dynamic = ["version", "description"]
+dependencies = [
+    "numpy",
+    "scipy",
+]
 
 [project.urls]
 Home = "https://github.com/robince/bayesian-prevalence"
