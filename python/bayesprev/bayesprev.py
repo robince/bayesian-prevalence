@@ -119,6 +119,24 @@ def hpdi(p, k, n, a=0.05, b=1):
     hpdi = (x - a) / (b - a)
     return hpdi
 
+def logodds(k, n, x=0.5, a=0.05, b=1):
+    """Posterior log-odds in favor of the population prevalence gamma being
+    greater than x
+
+    k : number of participants significant out of
+    n : total number of participants
+    x : log-odds theshold (default=0.5)
+    a : alpha value of within-participant test (default=0.05)
+    b : sensitivity/beta of within-participant test (default=1))
+
+    """
+
+    theta = a + (b - a) * x
+    b1 = k + r
+    b2 = n - k + s
+    p = (beta.cdf(b,b1,b2)-beta.cdf(theta,b1,b2)) / (beta.cdf(b,b1,b2)-beta.cdf(a,b1,b2));
+    lo = np.log(p/(1-p));
+    return lo
 
 def diff_between(k1, n1, k2, n2, p=0.96, a=0.05, b=1, Nsamp=10000):
     """Bayesian maximum a posteriori estimate of the difference in prevalence
