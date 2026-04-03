@@ -7,11 +7,12 @@
 # null hypothesis was rejected and 0 indicates it was not rejected
 
 import numpy as np
-import scipy as sp
 import bayesprev
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 # load the data
-sigdat = np.loadtxt('example_data.csv')
+sigdat = np.loadtxt(Path(__file__).with_name("example_data.csv"))
 
 # input values for Bayesian prevalence
 alpha = 0.05 # this specifies the alpha value used for the within-unit tests

@@ -6,28 +6,23 @@
   # unit (participant, neuron, voxel etc.) where 1 indicates the within-unit
   # null hypothesis was rejected and 0 indicates it was not rejected
   
-  # If the package "nleqslv" is not installed on your system, then
-  # uncomment the following line and install this package.
+  #  Load the required functions from the current working directory
 
-  # install.packages("nleqslv", dependencies =TRUE)
+ args <- commandArgs(trailingOnly = FALSE)
+ file_arg <- grep("^--file=", args, value = TRUE)
+ script_dir <- if (length(file_arg) > 0) {
+   dirname(normalizePath(sub("^--file=", "", file_arg[1])))
+ } else {
+   getwd()
+ }
+ repo_dir <- normalizePath(file.path(script_dir, ".."))
 
-
-   
- #    Load the nonlinear equation solver
-   
- library(nleqslv)
-         
- #    Set the working directory
- setwd("/users/jk/Desktop/PrevStuff")
-         
- #  Load the required functions from the current working directory
-
- source("bayesprev.R")
+ source(file.path(repo_dir, "R", "bayesprev.R"))
    
 
   # load the data
   
-  sigdat = read.csv("example_data.csv", header =FALSE);
+  sigdat = read.csv(file.path(repo_dir, "R", "example_data.csv"), header =FALSE);
 
   alpha = 0.05                       #   this specifies the alpha value used for the within-unit tests
   Ntests = nrow(sigdat);        #   number of tests (e.g. participants)
@@ -41,7 +36,7 @@
   
   # 0.95 lower bound for the population prevalence proportion
   
-  b = bayesprev_bound(0.05, Nsigtests, Ntests)
+  b = bayesprev_bound(0.95, Nsigtests, Ntests)
   print(b)
   
   # MAP estimate of the population prevalence proportion
@@ -72,7 +67,7 @@
   
   # Add the .95 lower bound as a vertical line
   
-  xbound = bayesprev_bound(0.05, Nsigtests, Ntests)
+  xbound = bayesprev_bound(0.95, Nsigtests, Ntests)
   pbound = bayesprev_posterior(xbound, Nsigtests, Ntests)
   lines(c(xbound, xbound), c(0, pbound+0.5), col="blue", lwd=3)
   

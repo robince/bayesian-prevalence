@@ -1,6 +1,35 @@
+require_bayesprev_package <- function(pkg) {
+	if (!requireNamespace(pkg, quietly = TRUE)) {
+		stop(sprintf("Package '%s' is required for this function.", pkg), call. = FALSE)
+	}
+}
 
-# nleqslv package required for HPDI optimization
-library(nleqslv)
+validate_prevalence_inputs <- function(k, n, a=0.05, b=1) {
+	if (n < 0) stop("n must be non-negative", call. = FALSE)
+	if (k < 0 || k > n) stop("k must satisfy 0 <= k <= n", call. = FALSE)
+	if (a < 0 || b > 1 || a >= b) stop("a and b must satisfy 0 <= a < b <= 1", call. = FALSE)
+}
+
+validate_diff_within_inputs <- function(k11, k10, k01, n, a=0.05, b=1) {
+	if (n < 0) stop("n must be non-negative", call. = FALSE)
+	if (min(k11, k10, k01) < 0) {
+		stop("k11, k10, and k01 must be non-negative", call. = FALSE)
+	}
+
+	if (length(a) == 1) a <- rep(a, 2)
+	if (length(b) == 1) b <- rep(b, 2)
+	if (length(a) != 2 || length(b) != 2) {
+		stop("a and b must be scalars or length-2 vectors", call. = FALSE)
+	}
+	if (any(a < 0) || any(b > 1) || any(a >= b)) {
+		stop("a and b must satisfy 0 <= a < b <= 1", call. = FALSE)
+	}
+
+	k00 <- n - k11 - k10 - k01
+	if (k00 < 0) stop("Input test results don't sum to n", call. = FALSE)
+
+	list(k00 = k00, a = a, b = b)
+}
 
 bayesprev_map <- function(k, n, a=0.05, b=1) {
 	# Bayesian maximum a posteriori estimate of population prevalence gamma
@@ -12,6 +41,7 @@ bayesprev_map <- function(k, n, a=0.05, b=1) {
 	#  a: alpha value of within-participant test (default=0.05)
 	#  b: sensitivity/beta of within-participant test (default=1)
 	   
+	validate_prevalence_inputs(k, n, a, b)
 	gm <- (k/n -a)/(b-a)
 	if(gm <0) gm <- 0
 	if(gm>1) gm <- 1
@@ -28,6 +58,7 @@ bayesprev_posterior <- function(x, k, n, a=0.05, b=1) {
     # a : alpha value of within-participant test (default=0.05)
     # b : sensitivity/beta of within-participant test (default=1)
     
+    validate_prevalence_inputs(k, n, a, b)
     m1 <-  k + 1
 	m2 <- n - k + 1
     theta <- a + (b-a)*x
@@ -47,6 +78,7 @@ bayesprev_bound <- function(p, k, n, a=0.05, b=1) {
     #  a : alpha value of within-participant test (default=0.05)
     #  b : sensitivity/beta of within-participant test (default=1)
 
+	validate_prevalence_inputs(k, n, a, b)
 	m1 <-  k + 1
 	m2 <- n - k + 1
 	th_c <- qbeta( p*pbeta(a, m1, m2) + (1-p)*pbeta(b, m1, m2), m1, m2 )
@@ -66,6 +98,8 @@ bayesprev_hpdi <- function(p, k, n, a=0.05, b=1) {
     #  a : alpha value of within-participant test (default=0.05)
     #  b : sensitivity/beta of within-participant test (default=1)
 
+	require_bayesprev_package("nleqslv")
+	validate_prevalence_inputs(k, n, a, b)
 	m1 <- k+1
 	m2 <- n-k+1
 	
@@ -105,10 +139,8 @@ bayesprev_hpdi <- function(p, k, n, a=0.05, b=1) {
 	x_init[1] <- qbeta( (1 -p1)*pbeta(a, m1, m2) + p1* pbeta(b, m1, m2), m1, m2 )
 	x_init[2] <- qbeta( (1 -p2)*pbeta(a, m1, m2) + p2* pbeta(b, m1, m2), m1, m2 )
 	   
-	opt <- nleqslv(x_init, g, method ="Newton", control=list(maxit=1000), m1=m1, m2=m2, a=a, b=b, p=p)
-
-	if (opt$termcd ==1)  print("convergence achieved") 
-	if (opt$termcd != 1)  print("failed to converge") 
+	opt <- nleqslv::nleqslv(x_init, g, method ="Newton", control=list(maxit=1000), m1=m1, m2=m2, a=a, b=b, p=p)
+	if (opt$termcd != 1) stop("HPDI solver failed to converge", call. = FALSE)
 	
 	temp <- opt$x
 	if (temp[1] <a) {
@@ -126,7 +158,7 @@ bayesprev_hpdi <- function(p, k, n, a=0.05, b=1) {
 
 # Functions for  Bayesian inference of difference in prevalence
 
-bayes_prev_diff_between <- function(k1, n1, k2, n2, p, a = 0.05, b = 1, Nsamp){
+bayesprev_diff_between <- function(k1, n1, k2, n2, p, a = 0.05, b = 1, Nsamp){
 
 # Bayesian posterior inference for the difference in prevalence 
 # when the same test is applied to two different groups
@@ -150,10 +182,10 @@ bayes_prev_diff_between <- function(k1, n1, k2, n2, p, a = 0.05, b = 1, Nsamp){
 #                         is higher in group 1
 #  gpost : ggplot object of posterior distribution of the prevalence difference
 
-#  Load the necessary libraries
-  
-  library(HDInterval)
-  library(ggplot2)
+  require_bayesprev_package("HDInterval")
+  require_bayesprev_package("ggplot2")
+  validate_prevalence_inputs(k1, n1, a, b)
+  validate_prevalence_inputs(k2, n2, a, b)
   
 # Parameters for uniform priors
 
@@ -188,7 +220,7 @@ bayes_prev_diff_between <- function(k1, n1, k2, n2, p, a = 0.05, b = 1, Nsamp){
 
 # Compute the HPD interval, coverage = p
 
-  hpdi = hdi(delta, credMass = p)
+  hpdi = HDInterval::hdi(delta, credMass = p)
 
 # Approximate MAP estimate
 
@@ -201,14 +233,18 @@ fill <- "gold1"
 line <- "goldenrod2"
 dd =data.frame(delta)
 
-gpost <- ggplot(dd, aes(x=delta)) +
-        geom_density(fill = fill, colour = line, bw ="SJ") +
-        scale_x_continuous(name = "Prevalence difference",
+gpost <- ggplot2::ggplot(dd, ggplot2::aes(x=delta)) +
+        ggplot2::geom_density(fill = fill, colour = line, bw ="SJ") +
+        ggplot2::scale_x_continuous(name = "Prevalence difference",
                            limits=c(-1, 1)) +
-        scale_y_continuous(name = "Posterior density") +
-        ggtitle("Posterior density of difference in Prevalence")
+        ggplot2::scale_y_continuous(name = "Posterior density") +
+        ggplot2::ggtitle("Posterior density of difference in Prevalence")
 
 return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpost = gpost))
+}
+
+bayes_prev_diff_between <- function(k1, n1, k2, n2, p, a = 0.05, b = 1, Nsamp) {
+	bayesprev_diff_between(k1, n1, k2, n2, p, a, b, Nsamp)
 }
 
 
@@ -237,10 +273,11 @@ return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpos
 #                         is higher on test 1
 # gpost : ggplot object of the posterior distribution
 
-# Load the necessary libraries
-
-  library(HDInterval)
-  library(ggplot2)
+  require_bayesprev_package("HDInterval")
+  require_bayesprev_package("ggplot2")
+  validated <- validate_diff_within_inputs(k11, k10, k01, n, a, b)
+  a <- validated$a
+  b <- validated$b
   
 # Define the parameters  for the Dirichlet prior distribution -- 
 # here giving a uniform distribution
@@ -249,7 +286,7 @@ return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpos
 
 # Compute the parameters for the posterior Dirichlet distribution
 
-  k00 = n - k11 - k10 - k01
+  k00 = validated$k00
 
   m11 = k11 + r11 ; m10 = k10 + r10 
   m01 = k01 + r01 ; m00 = k00 + r00
@@ -257,15 +294,15 @@ return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpos
 
 # Compute samples from the truncated Dirichlet posterior
 
-  z11 = runif(Nsamp, pbeta(0, m11, m10 + m01 + m00), pbeta(b, m11, m10 + m01 + m00))
+  z11 = runif(Nsamp, pbeta(0, m11, m10 + m01 + m00), pbeta(min(b), m11, m10 + m01 + m00))
   u11 = qbeta(z11, m11, m10 + m01 + m00); th11 = u11
 
-  lo = pmax( (a - th11)/(1-th11), 0); hi = (b - th11)/(1-th11)
+  lo = pmax( (a[1] - th11)/(1-th11), 0); hi = (b[1] - th11)/(1-th11)
   z10 = runif(Nsamp, pbeta(lo, m10,  m01 + m00), pbeta(hi, m10, m01 + m00))
   u10 = qbeta(z10, m10,  m01 + m00); th10 = (1 - th11)*u10
 
 
-  lo = pmax( (a - th11)/(1-th11 - th10), 0); hi = pmin( (b - th11)/(1-th11- th10), 1 )
+  lo = pmax( (a[2] - th11)/(1-th11 - th10), 0); hi = pmin( (b[2] - th11)/(1-th11- th10), 1 )
   z01 = runif(Nsamp, pbeta(lo, m01,   m00), pbeta(hi, m01,  m00))
   u01 = qbeta(z01, m01,   m00); th01 = (1 -th11 - th10)*u01
 
@@ -275,7 +312,7 @@ return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpos
 
 # Compute vector of estimates of prevalence difference
 
-  delta = (th10 - th01)/(b-a)  
+  delta = (th11 + th10 - a[1])/(b[1]-a[1]) - (th11 + th01 - a[2])/(b[2]-a[2])  
   
 # Estimate the posterior probability, and logodds, that the prevalence is higher on test 1.
 # Laplace's rule of succession used to avoid estimates of 0 or 1
@@ -287,9 +324,7 @@ return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpos
 
 # Compute the 96% HPDI
 
-  hpdi = hdi(delta, credMass = p)
-
-  dens = density(delta, bw = "SJ")
+  hpdi = HDInterval::hdi(delta, credMass = p)
 
 # Approximate MAP estimate
 
@@ -303,12 +338,12 @@ return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpos
 
   dd = data.frame(delta)
 
-  gpost <- ggplot(dd, aes(x=delta)) +
-        geom_density(fill = fill, colour = line, bw ="SJ") +
-        scale_x_continuous(name = "Prevalence difference",
+  gpost <- ggplot2::ggplot(dd, ggplot2::aes(x=delta)) +
+        ggplot2::geom_density(fill = fill, colour = line, bw ="SJ") +
+        ggplot2::scale_x_continuous(name = "Prevalence difference",
                            limits=c(-1, 1)) +
-        scale_y_continuous(name = "Posterior density") +
-        ggtitle("Posterior density of difference in Prevalence")
+        ggplot2::scale_y_continuous(name = "Posterior density") +
+        ggplot2::ggtitle("Posterior density of difference in Prevalence")
 
   return(list(map = map, hpdi = hpdi, probGT = probGT, logoddsGT = logoddsGT, gpost = gpost))
 }
@@ -370,5 +405,4 @@ sim_multinom <- function(g1, g2, r12, n, a = 0.05, b = 1){
   
   return(list(k11 = mdat[1], k10 = mdat[2], k01 = mdat[3], k00 = mdat[4]))
 }
-
 

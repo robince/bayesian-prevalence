@@ -1,4 +1,4 @@
-"""Bayesian estimation of population prevalence
+"""Bayesian estimation of population prevalence.
 
 Bayesian inference of population prevalence
 RAA Ince, AT Paton, JW Kay & PG Schyns
@@ -22,6 +22,39 @@ r = 1
 s = 1
 
 
+def _validate_prevalence_inputs(k, n, a, b):
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    if k < 0 or k > n:
+        raise ValueError("k must satisfy 0 <= k <= n")
+    if not 0 <= a < b <= 1:
+        raise ValueError("a and b must satisfy 0 <= a < b <= 1")
+
+
+def _validate_diff_within_inputs(k11, k10, k01, n, a, b):
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    if min(k11, k10, k01) < 0:
+        raise ValueError("k11, k10, and k01 must be non-negative")
+
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    if a.ndim == 0:
+        a = np.repeat(a, 2)
+    if b.ndim == 0:
+        b = np.repeat(b, 2)
+    if a.shape != (2,) or b.shape != (2,):
+        raise ValueError("a and b must be scalars or length-2 arrays")
+    if np.any(a < 0) or np.any(b > 1) or np.any(a >= b):
+        raise ValueError("a and b must satisfy 0 <= a < b <= 1")
+
+    k00 = n - k11 - k10 - k01
+    if k00 < 0:
+        raise ValueError("Input test results do not sum to n")
+
+    return k00, a, b
+
+
 def map(k, n, a=0.05, b=1):
     """Bayesian maximum a posteriori estimate of population prevalence gamma
     under a uniform prior
@@ -33,6 +66,7 @@ def map(k, n, a=0.05, b=1):
 
     """
 
+    _validate_prevalence_inputs(k, n, a, b)
     theta = (k + r - 1.0) / (n + r + s - 2.0)
     if theta <= a:
         return 0.0
@@ -54,6 +88,7 @@ def posterior(x, k, n, a=0.05, b=1):
 
     """
 
+    _validate_prevalence_inputs(k, n, a, b)
     theta = a + (b - a) * x
     post = (b - a) * beta.pdf(theta, k + r, n - k + s)
     post = post / (beta.cdf(b, k + r, n - k + s) - beta.cdf(a, k + r, n - k + s))
@@ -71,6 +106,7 @@ def bound(p, k, n, a=0.05, b=1):
 
     """
 
+    _validate_prevalence_inputs(k, n, a, b)
     b1 = k + r
     b2 = n - k + s
     cdfp = (1 - p) * beta.cdf(b, b1, b2) + p * beta.cdf(a, b1, b2)
@@ -91,6 +127,7 @@ def hpdi(p, k, n, a=0.05, b=1):
 
     """
 
+    _validate_prevalence_inputs(k, n, a, b)
     b1 = k + r
     b2 = n - k + s
 
@@ -101,7 +138,7 @@ def hpdi(p, k, n, a=0.05, b=1):
     )
     tbicdf = lambda x: beta.ppf((1 - x) * beta.cdf(a, b1, b2) + x * beta.cdf(b, b1, b2), b1, b2)
 
-    if k == a:
+    if k == 0:
         x = np.array([a, tbicdf(p)])
     elif k == n:
         x = np.array([tbicdf(1 - p), b])
@@ -110,6 +147,8 @@ def hpdi(p, k, n, a=0.05, b=1):
         x, info, ier, mesg = fsolve(
             f, np.array([tbicdf((1 - p) / 2), tbicdf((1 + p) / 2)]), full_output=True
         )
+        if ier != 1:
+            raise RuntimeError(f"HPDI solver failed to converge: {mesg}")
 
     # limit to valid theta values
     if (x[0] < a) or (x[1] < x[0]):
@@ -131,6 +170,7 @@ def logodds(k, n, x=0.5, a=0.05, b=1):
 
     """
 
+    _validate_prevalence_inputs(k, n, a, b)
     theta = a + (b - a) * x
     b1 = k + r
     b2 = n - k + s
@@ -163,6 +203,9 @@ def diff_between(k1, n1, k2, n2, p=0.96, a=0.05, b=1, Nsamp=10000):
     samples : posterior samples
 
     """
+
+    _validate_prevalence_inputs(k1, n1, a, b)
+    _validate_prevalence_inputs(k2, n2, a, b)
 
     # gamma priors = Beta(r,s)
     r1 = 1
@@ -242,6 +285,8 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
 
     """
 
+    k00, a, b = _validate_diff_within_inputs(k11, k10, k01, n, a, b)
+
     # Parameters for the Dirichlet prior distribution (1,1,1,1) = uniform
     r11 = 1
     r10 = 1
@@ -249,13 +294,12 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     r00 = 1
 
     # parameters for posterior Dirichlet distribution
-    k00 = n - k11 - k10 - k01
     m11 = k11 + r11
     m10 = k10 + r10
     m01 = k01 + r01
     m00 = k00 + r00
 
-    r11 = (beta.cdf(0, m11, m10 + m01 + m00), beta.cdf(b, m11, m10 + m01 + m00))
+    r11 = (beta.cdf(0, m11, m10 + m01 + m00), beta.cdf(np.min(b), m11, m10 + m01 + m00))
     if np.any(np.isclose(*r11, rtol=1e-12, atol=1e-12)):
         res = {
             x: np.NaN for x in ["map", "post_x", "post", "hpdi", "probGT", "logoddsGT", "samples"]
@@ -265,8 +309,8 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     z11 = np.random.uniform(r11[0], r11[1], Nsamp)
     th11 = beta.ppf(z11, m11, m10 + m01 + m00)
 
-    lo = np.maximum((a - th11) / (1 - th11), 0)
-    hi = (b - th11) / (1 - th11)
+    lo = np.maximum((a[0] - th11) / (1 - th11), 0)
+    hi = (b[0] - th11) / (1 - th11)
 
     r10 = beta.cdf(lo, m10, m01 + m00), beta.cdf(hi, m10, m01 + m00)
     if np.any(np.isclose(*r10, rtol=1e-12, atol=1e-12)):
@@ -278,8 +322,8 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     u10 = beta.ppf(z10, m10, m01 + m00)
     th10 = (1 - th11) * u10
 
-    lo = np.maximum((a - th11) / (1 - th11 - th10), 0)
-    hi = np.minimum((b - th11) / (1 - th11 - th10), 1)
+    lo = np.maximum((a[1] - th11) / (1 - th11 - th10), 0)
+    hi = np.minimum((b[1] - th11) / (1 - th11 - th10), 1)
     r01 = (beta.cdf(lo, m01, m00), beta.cdf(hi, m01, m00))
     if np.any(np.isclose(*r01, rtol=1e-12, atol=1e-12)):
         res = {
@@ -290,10 +334,8 @@ def diff_within(k11, k10, k01, n, p=0.96, a=0.05, b=1, Nsamp=10000):
     u01 = beta.ppf(z01, m01, m00)
     th01 = (1 - th11 - th10) * u01
 
-    th00 = 1 - th11 - th10 - th01
-
     # samples of posterior prevalence difference
-    samples = (th10 - th01) / (b - a)
+    samples = (th11 + th10 - a[0]) / (b[0] - a[0]) - (th11 + th01 - a[1]) / (b[1] - a[1])
 
     # kernel density estimate of posterior
     post_x = np.linspace(-1, 1, 200)
