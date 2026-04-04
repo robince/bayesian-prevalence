@@ -52,6 +52,10 @@ Returns MAP, kernel density fit to posterior density, HPDI of p, probability `g1
 
 `pip install bayesprev`
 
+For local development in this repository:
+
+`uv sync`
+
 ### Matlab
 
 Clone or download this repository, then in Matlab add folder to path: 
@@ -62,7 +66,7 @@ Clone or download this repository, then in Matlab add folder to path:
 
 Clone or download this repository, then in R:
 
-`source("bayesprev.R")`
+`source("R/bayesprev.R")`
 
 ## Contact
 

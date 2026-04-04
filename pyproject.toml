@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bayesprev"
+dynamic = ["version"]
+description = "Bayesian inference of population prevalence."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Robin Ince", email = "robince@gmail.com" },
+]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+]
+
+[project.urls]
+Home = "https://github.com/robince/bayesian-prevalence"
+
+[dependency-groups]
+dev = [
+    "matplotlib",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.hatch.version]
+path = "python/src/bayesprev/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["python/src/bayesprev"]
+sources = ["python/src"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/README.md",
+    "/LICENSE",
+    "/python/src/bayesprev",
+    "/python/bayesprev_example.py",
+    "/python/example_csv.py",
+    "/python/example_data.csv",
+]
