@@ -23,10 +23,12 @@ s = 1
 
 
 def _validate_prevalence_inputs(k, n, a, b):
-    if n < 0:
-        raise ValueError("n must be non-negative")
+    if n <= 0:
+        raise ValueError("n must be positive")
     if k < 0 or k > n:
         raise ValueError("k must satisfy 0 <= k <= n")
+    if np.ndim(a) != 0 or np.ndim(b) != 0:
+        raise ValueError("a and b must be scalar values")
     if not 0 <= a < b <= 1:
         raise ValueError("a and b must satisfy 0 <= a < b <= 1")
 

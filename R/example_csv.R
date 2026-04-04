@@ -10,12 +10,12 @@
 
  args <- commandArgs(trailingOnly = FALSE)
  file_arg <- grep("^--file=", args, value = TRUE)
- script_dir <- if (length(file_arg) > 0) {
-   dirname(normalizePath(sub("^--file=", "", file_arg[1])))
+ if (length(file_arg) > 0) {
+   script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg[1]), mustWork = FALSE))
+   repo_dir <- normalizePath(file.path(script_dir, ".."), mustWork = FALSE)
  } else {
-   getwd()
+   repo_dir <- normalizePath(getwd(), mustWork = FALSE)
  }
- repo_dir <- normalizePath(file.path(script_dir, ".."))
 
  source(file.path(repo_dir, "R", "bayesprev.R"))
    

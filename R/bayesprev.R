@@ -5,8 +5,11 @@ require_bayesprev_package <- function(pkg) {
 }
 
 validate_prevalence_inputs <- function(k, n, a=0.05, b=1) {
-	if (n < 0) stop("n must be non-negative", call. = FALSE)
+	if (n <= 0) stop("n must be positive", call. = FALSE)
 	if (k < 0 || k > n) stop("k must satisfy 0 <= k <= n", call. = FALSE)
+	if (length(a) != 1 || length(b) != 1) {
+		stop("a and b must be scalar values", call. = FALSE)
+	}
 	if (a < 0 || b > 1 || a >= b) stop("a and b must satisfy 0 <= a < b <= 1", call. = FALSE)
 }
 
@@ -405,4 +408,3 @@ sim_multinom <- function(g1, g2, r12, n, a = 0.05, b = 1){
   
   return(list(k11 = mdat[1], k10 = mdat[2], k01 = mdat[3], k00 = mdat[4]))
 }
-
