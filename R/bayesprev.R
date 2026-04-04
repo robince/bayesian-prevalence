@@ -142,8 +142,22 @@ bayesprev_hpdi <- function(p, k, n, a=0.05, b=1) {
 	x_init[1] <- qbeta( (1 -p1)*pbeta(a, m1, m2) + p1* pbeta(b, m1, m2), m1, m2 )
 	x_init[2] <- qbeta( (1 -p2)*pbeta(a, m1, m2) + p2* pbeta(b, m1, m2), m1, m2 )
 	   
-	opt <- nleqslv::nleqslv(x_init, g, method ="Newton", control=list(maxit=1000), m1=m1, m2=m2, a=a, b=b, p=p)
-	if (opt$termcd != 1) stop("HPDI solver failed to converge", call. = FALSE)
+	ftol <- 1e-8
+	opt <- nleqslv::nleqslv(
+		x_init,
+		g,
+		method ="Newton",
+		control=list(maxit=1000, ftol=ftol),
+		m1=m1,
+		m2=m2,
+		a=a,
+		b=b,
+		p=p
+	)
+	acceptable_step_tolerance <- opt$termcd == 2 && max(abs(opt$fvec)) <= ftol
+	if (!(opt$termcd == 1 || acceptable_step_tolerance)) {
+		stop(sprintf("HPDI solver failed to converge: %s", opt$message), call. = FALSE)
+	}
 	
 	temp <- opt$x
 	if (temp[1] <a) {
